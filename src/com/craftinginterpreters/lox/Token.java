@@ -13,6 +13,7 @@ public class Token {
     //Ex2: [lox] hello -> lexeme = "hello", literal = "hello"
     //Ex3: [lox] NIL -> lexeme = "NIL", literal = NULL
     //literal이 Object 타입인 이유는 literal에는 여러 타입의 값들이 들어올 수 있기 때문이다.
+    //4.5장에 보면 literal이 없는 토큰들은 값을 null로 설정한다.
 
     //Token 생성자
     Token(TokenType type, String lexeme, Object literal, int line) {
