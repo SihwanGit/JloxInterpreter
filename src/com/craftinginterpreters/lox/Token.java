@@ -5,6 +5,7 @@ public class Token {
     final TokenType type;
     final String lexeme;
     final Object literal; //identifier, string, number
+    //록스는 number에서 실수/정수를 구분하지 않았다.
     final int line;
 
     //스캐너는 리터럴의 각 문자를 탐색할 때 값의 텍스트 표현을 나중에 인터프리터가 사용할 라이브 런타임 객체로 변환
