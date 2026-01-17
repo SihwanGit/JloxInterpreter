@@ -55,7 +55,7 @@ public class Lox {
 
         //지금은 단순히 토큰을 출력한다.
         for(Token token : tokens) {
-            System.out.println(token);
+            System.out.println(token); //토큰 출력 (토큰Type, text, 리터럴의 쌍으로 출력됨. Token 클래스에서 그렇게 정의함)
         }
     }
 

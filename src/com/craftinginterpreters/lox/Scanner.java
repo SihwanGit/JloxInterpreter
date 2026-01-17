@@ -21,6 +21,28 @@ class Scanner {
     //4.4장 start, current 필드는 문자열의 위치를 가리키는 offset이다.
     //start는 스캔 중인 렉스의 춧 문자, current는 현재 처리 중인 문자, line 필드는 current가 위치한 줄이다.
 
+    //4.7 키워드를 처리하기 위한 맵
+    private static final Map<String, TokenType> keywords;
+    static {
+        keywords = new HashMap<>(); //키워드는 맵으로 정의한다.
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print ", PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
+    }
+
     Scanner(String source) { //run함수에서 매개변수로 받은 source를 this.source로 설정함
         this.source = source;
     }
@@ -103,7 +125,10 @@ class Scanner {
             default:
                 if(isDigit(c)) { //4.6 숫자는 0~9를 다 switch로 처리하면 귀찮으니까 default로 빼서 처리
                     number();
-                } else {
+                } else if(isAlpha(c)) { //4.7 id와 키워들르 처리
+                    identifier();
+                }
+                else {
                     Lox.error(line, "Unexpected character");
                 }
                 break;
@@ -146,6 +171,7 @@ class Scanner {
         if(isAtEnd()) return '\0';
         return source.charAt(current);
     }
+    //peek(int n) return source.charAt(current + n)으로 n번째 뒤의 peek로도 구현 가능
 
     // 4.6 string literal 처리를 위한 string 함수
     private void string() {
@@ -199,6 +225,27 @@ class Scanner {
     private char peekNext() {
         if(current +1 >= source.length()) return '\0'; //다다음 문자가 끝나는 지점인 경우
         return source.charAt(current+1);
+    }
+
+    //4.7 identifier에 사용할 수 있는 문자 : 알파벳대소문자 + 언더바
+    private boolean isAlpha( char c) {
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+    }
+
+    private boolean isAlphaNumeric( char c) {
+        return isAlpha(c) || isDigit(c);
+    }
+
+    //4.7 identifier 토큰 생성
+    private void identifier() {
+        while(isAlphaNumeric(peek())) advance();
+
+        String text = source.substring(start, current); //읽은 문자들을 text에 저장
+        TokenType type = keywords.get(text); //text에 저장된 문장이 키워드면 type은 키워드다.
+        if(type == null) type = IDENTIFIER; //그렇지 않다면 식별자다.
+        addToken(type); //식별자or키워드로 토큰을 생성한다
     }
 
 }
