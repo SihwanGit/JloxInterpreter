@@ -34,7 +34,7 @@ class Scanner {
         keywords.put("if", IF);
         keywords.put("nil", NIL);
         keywords.put("or", OR);
-        keywords.put("print ", PRINT);
+        keywords.put("print", PRINT);
         keywords.put("return", RETURN);
         keywords.put("super", SUPER);
         keywords.put("this", THIS);
@@ -52,6 +52,10 @@ class Scanner {
         while(!isAtEnd()) {
             //다음 렉심의 시작 부분에 있다.
             start = current;
+            //사용자가 입력한 코드가 문자열 형태로 들어오면 그걸 앞에서부터 쭉 읽는다.
+            //start는 고정되어 있고 current가 쭉 앞으로 가면서 읽는다.
+            //current가 멈추면 start부터 current까지가 하나의 토큰이 되고, 다시 start = current로 둘의 위치를 맞춘다.
+            //이걸 문장이 끝날때까지 계속 반복한다.
             scanToken();
         }
         //소스코드를 처음부터 끝까지 읽어 문자가 없을 떄까지 토큰을 추가한다.
@@ -102,7 +106,28 @@ class Scanner {
                 if(match('/')) {
                     //주석은 줄 끝까지 이어진다
                     while(peek() != '\n' && !isAtEnd()) advance();
-                    //끝나거나 강제개행 전까지 advance, addToken은 호출하지 않는다.
+                    //끝나거나 강제개행 전까지 advance만 수행하고 addToken은 호출하지 않는다.
+                } else if(match('*')) { //4장 연습문제 4번
+                    int level = 0; // 주석 중첩을 위한 레벨
+                    while(!(peek() == '*' && peekNext() == '/' && level == 0) && !isAtEnd()) {
+                        // 만약 조건을 while(peek() != '*' && peekNext() != '/') 이렇게 작성하면,
+                        // *만 나왔을 떄 peekNext는 /이 아니지만 peek != '*'가 F가 되면서 while문이 깨진다.
+                        // 그래서 조건을 !(peek == '*' && peekNext == '/')으로 설정해야, 중간에 *가 와도 안깨진다.
+                        // 이후 */이 나오고 level일 때만 종료되게끔 규칙을 수정한다.
+
+                        if(peek() == '/' && peekNext() == '*') { //도중에 /* 이 또 나오면 level을 올린다.
+                            level++;
+                        }
+                        if(peek() == '*' && peekNext() == '/' && level != 0) { // 다시 */ 이 나오면 level 감소
+                            level--;
+                        }
+                        if(peek() == '\n') line++; //peek가 강제 개행 문자면 line++
+                        advance(); // 토큰은 만들지 않고 소모
+                    }
+                    // *와 /를 룩어헤드로 확인했기 떄문에 */는 그대로 source에 남아있다.
+                    // 따라서 advance()를 두번 실행해 처리해줘야한다.
+                    advance();
+                    advance();
                 } else {
                     addToken(SLASH);
                 }
@@ -120,15 +145,14 @@ class Scanner {
             //4.6 문자열 리터럴
             case '"': string(); break;
 
-            //등록되지 않은 토큰은 에러처리 Ex : @ # ^ etc
             //에러를 처리하지 않으면 무한루프에 빠질 수도 있음
             default:
                 if(isDigit(c)) { //4.6 숫자는 0~9를 다 switch로 처리하면 귀찮으니까 default로 빼서 처리
                     number();
-                } else if(isAlpha(c)) { //4.7 id와 키워들르 처리
+                } else if(isAlpha(c)) { //4.7 id와 키워드로 처리
                     identifier();
                 }
-                else {
+                else { //4.5 등록되지 않은 토큰은 에러처리 Ex : @ # ^ etc
                     Lox.error(line, "Unexpected character");
                 }
                 break;
@@ -137,7 +161,8 @@ class Scanner {
 
     //4.5 current를 더해가며 차례대로 소스파일의 다음 문자를 읽어 리턴한다.
     //scanTokens(읽은 토큰들을 배열에 저장) -> scanToken(읽은 토큰들을 체크) -> adbance(단어 하나하나 읽음)
-    //읽은 문자를 소비해서 다시 인식이 되지 않게 함. (정의되지 않은 문자도 포함)
+    //current가 무조건 증가하기 때문에 한번 읽은 문자는 다시 읽지 않음. 그것을 책에서는 "소비했다"고 표현한다.
+    //읽은 문자를 "소비"해서 다시 인식이 되지 않게 함. (정의되지 않은 문자도 포함)
     private char advance() {
         return source.charAt(current++);
     }
@@ -150,18 +175,19 @@ class Scanner {
     //4.5 리터럴(값)이 있는 토큰
     private void addToken(TokenType type, Object literal) {
         String text = source.substring(start, current);
+        //우리가 입력받은 코드 문자열 source에서 start부터 current까지 서브스트링으로 분리
         tokens.add(new Token(type, text, literal, line));
     }
 
     //4.5장 2개 이상의 문자로 구성된 렉심을 검사할 때 뒤에 오는 토큰에 따라 T/F값을 반환하는 함수
     //조건부 advance라고 생각하면 편하다.
-    //4.6 match는 advance와 peek를 합친거라서 얘도 LOOKAHEAD
+    //4.6 match는 true일 땐 advance, false일 땐 peek라서 LOOKAHEAD로 볼 수도 있다.
     private boolean match(char expected) {
         if(isAtEnd()) return false; //입력을 다 읽었으면 False를 반환
         if(source.charAt(current) !=  expected) return false; //매개변수로 받은 문자와 다르면
         // Ex match(=)인데 =이 아닌 다른 문자가 뒤에 오면 false를 반환
 
-        current++;
+        current++; //같은 토큰으로 묶일 예정이니까 ++로 소비처리
         return true;
     }
 
@@ -169,7 +195,7 @@ class Scanner {
     //advance는 읽고 버리면, 얘는 그냥 읽기만 함. 이를 LOOKAHEAD라고 부른다.
     private char peek() {
         if(isAtEnd()) return '\0';
-        return source.charAt(current);
+        return source.charAt(current); //advance는 current++이였는데, 얘는 그냥 current만 했다.
     }
     //peek(int n) return source.charAt(current + n)으로 n번째 뒤의 peek로도 구현 가능
 
@@ -192,16 +218,14 @@ class Scanner {
 
         //앞뒤 끝따옴표 제거
         //이전까지는 토큰이 여러개의 문자로 이루어진 경우 시작부터 끝까지 묶어서 토큰을 만듦
-        //그러나 문자열 리터럴은 시작과 끝을 제외한 " "의 안쪽만 묶어서 토큰으로 만듦
+        //그러나 문자열 리터럴은 시작과 끝을 제외한 " "의 안쪽만 묶어서 토큰으로 만듦 (lexeme은 " " 포함)
         String value = source.substring(start+1, current-1);
         addToken(STRING, value);
     }
     
     //4.6 매개변수 c가 숫자인지 문자인지 구분
     //자바 표준 라이브러리의 isDigit을 써도 되지만 그건 록스에 없는 기능도 제공해서 꼬일 수도 있으니 새로 만든 것
-    private boolean isDigit(char c) {
-        return c >= '0' && c <= '9';
-    }
+    private boolean isDigit(char c) { return c >= '0' && c <= '9'; }
     
     //4.6 숫자로 변환하는 코드
     private void number() {
@@ -241,6 +265,7 @@ class Scanner {
     //4.7 identifier 토큰 생성
     private void identifier() {
         while(isAlphaNumeric(peek())) advance();
+        //다음 문자가 알파벳 또는 숫자라면, 계속 소비한다.
 
         String text = source.substring(start, current); //읽은 문자들을 text에 저장
         TokenType type = keywords.get(text); //text에 저장된 문장이 키워드면 type은 키워드다.
