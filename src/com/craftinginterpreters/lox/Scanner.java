@@ -102,8 +102,10 @@ class Scanner {
                 if(match('/')) {
                     //주석은 줄 끝까지 이어진다
                     while(peek() != '\n' && !isAtEnd()) advance();
-                    //끝나거나 강제개행 전까지 advance, addToken은 호출하지 않는다.
-                    // 4장 4번 문제의 /* */ 주석 문제는
+                    // 끝나거나 강제개행 전까지 advance, addToken은 호출하지 않는다.
+                    // 4장 4번 문제의 /* */ 주석 문제는 Jlox/chapter4-2 버전으로 보샘.
+                    // 그냥 Jlox/chapter4도 가능한데, 이 코드는 버그 위험이 있어서 4-2판이 안전함.
+                    // 그리고 정규문법에 대한 설명들도 추가함.
                 } else {
                     addToken(SLASH);
                 }
