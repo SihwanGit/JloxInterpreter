@@ -103,6 +103,7 @@ class Scanner {
                     //주석은 줄 끝까지 이어진다
                     while(peek() != '\n' && !isAtEnd()) advance();
                     //끝나거나 강제개행 전까지 advance, addToken은 호출하지 않는다.
+                    // 4장 4번 문제의 /* */ 주석 문제는
                 } else {
                     addToken(SLASH);
                 }
