@@ -108,26 +108,43 @@ class Scanner {
                     while(peek() != '\n' && !isAtEnd()) advance();
                     //끝나거나 강제개행 전까지 advance만 수행하고 addToken은 호출하지 않는다.
                 } else if(match('*')) { //4장 연습문제 4번
-                    int level = 0; // 주석 중첩을 위한 레벨
-                    while(!(peek() == '*' && peekNext() == '/' && level == 0) && !isAtEnd()) {
+                    int level = 1; // 주석 중첩을 위한 레벨
+                    while(level > 0 && !isAtEnd()) {
                         // 만약 조건을 while(peek() != '*' && peekNext() != '/') 이렇게 작성하면,
                         // *만 나왔을 떄 peekNext는 /이 아니지만 peek != '*'가 F가 되면서 while문이 깨진다.
                         // 그래서 조건을 !(peek == '*' && peekNext == '/')으로 설정해야, 중간에 *가 와도 안깨진다.
                         // 이후 */이 나오고 level일 때만 종료되게끔 규칙을 수정한다.
 
+                        if(peek() == '\n') line++; //peek가 강제 개행 문자면 line++
+
+                        /*
+                        정규 문법을 사용해 구현하는 유한오토마타 FA는 무한대로 커지는 스택이나 메모리 없이
+                        한적정인 상태만으로 작동해야한다.
+                        그러나 python이나 하스켈같은 언어는 들여쓰기를 이용해 블록의 깊이를 감지하기 떄문에
+                        깊이를 저장하기 위한 스택이 반드시 필요하다. 따라서 해당 문법들은 정규 문법으로 구현할 수 없다.
+
+                        마찬가지 논리로 지금 내가 구현하고 있는 중첩 주석의 경우도 level이라는 깊이를 기록하는 변수가 있고,
+                        이 level은 이론상 무한하기 떄문에 해당 기능은 정규 문법이 아니다.
+                         */
                         if(peek() == '/' && peekNext() == '*') { //도중에 /* 이 또 나오면 level을 올린다.
                             level++;
+                            advance(); // /과 *를 처리
+                            advance();
+                            continue;
                         }
-                        if(peek() == '*' && peekNext() == '/' && level != 0) { // 다시 */ 이 나오면 level 감소
+                        if(peek() == '*' && peekNext() == '/') { // 다시 */ 이 나오면 level 감소
                             level--;
+                            advance(); // *와 /을 처리
+                            advance();
+                            continue; // /*후 바로 */가 나오면 continue로 조건 검사를 하러가면서 종료됨.
                         }
-                        if(peek() == '\n') line++; //peek가 강제 개행 문자면 line++
-                        advance(); // 토큰은 만들지 않고 소모
+                        //advance()를 두번씩 해주는 이유는 /*와 */을 없애주기 위함.
+                        //왜냐면 한번 인식한 /와 *를 없애지 않으면 /**/이나 /*/*/* 같은 구조에서 버그가 발생할 수 있다.
+
+                        advance(); // 나머지 문자들은 토큰은 만들지 않고 소모
                     }
-                    // *와 /를 룩어헤드로 확인했기 떄문에 */는 그대로 source에 남아있다.
-                    // 따라서 advance()를 두번 실행해 처리해줘야한다.
-                    advance();
-                    advance();
+                    // 뒤쪽에 advance()를 남기는 경우 주석이 정상종료되는게 아닌, EOF로 끝났을 떄 에러가 날 수 있다.
+                    if(isAtEnd() && level > 0) Lox.error(line, "Unterminated block comment");
                 } else {
                     addToken(SLASH);
                 }
