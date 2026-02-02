@@ -35,12 +35,19 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        //5.3 비지터 패턴 적용
+        defineVisitor(writer, baseName, types);
+
         //5.2장 AST 클래스
         for(String type : types) {
             String className = type.split(":")[0].trim(); //split는 문자열을 자르는 함수
             String fields = type.split(":")[1].trim();
             defineType(writer, baseName, className, fields);
         }
+
+        //5.3장 비지터 패턴을 위한 베이스 accept 메서드
+        writer.println();
+        writer.println("    abstract <R> R accept(Visitor<R> visitor);");
 
         writer.println("}");
         writer.close();
@@ -63,10 +70,33 @@ public class GenerateAst {
 
         writer.println("    }");
 
+        //5.3장 비지터 패턴
+        writer.println();
+        writer.println("    @Override");
+        writer.println("    <R> R accept(Visitor<R> visitor) {");
+        writer.println("        return visitor.visit" +
+                className + baseName + "(this);");
+        writer.println("    }");
+
         //필드
         writer.println();
         for(String field : fields) {
             writer.println("     final " + field + ";");
+        }
+
+        writer.println("    }");
+    }
+
+    //5.3장 비지터 패턴을 위한 defineVisitor
+    //비지터 패턴이란 타입과 알고리즘을 분리시키는 기법이다.
+    private static void defineVisitor(
+            PrintWriter writer, String baseName, List<String> types) {
+        writer.println("    interface Visitor<R> {");
+
+        for(String type : types) {
+            String typeName = type.split(":")[0].trim();
+            writer.println("    R visit" + typeName + baseName + "(" +
+                    typeName + " " + baseName.toLowerCase() + ");");
         }
 
         writer.println("    }");
