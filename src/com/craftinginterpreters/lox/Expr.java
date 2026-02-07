@@ -56,7 +56,6 @@ abstract class Expr {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitBinaryExpr(this);
         }
-
         final Expr left;
         final Token operator;
         final Expr right;
@@ -93,7 +92,6 @@ abstract class Expr {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitGetExpr(this);
         }
-
         final Expr object;
         final Token name;
     }
@@ -109,8 +107,24 @@ abstract class Expr {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitGroupingExpr(this);
         }
-
         final Expr expression;
+    }
+
+    //리터럴 표현식
+    static class Literal extends Expr {
+        Literal(Object value) {
+            this.value = value;
+            //리터럴은 값만 들어오면 됨.
+            //값의 타입은 떄에따라 다르므로 Object로 설정
+            //Token 클래스에서도 literal은 Object로 설정했었음
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitLiteralExpr(this);
+        }
+
+        final Object value;
     }
     
     abstract <R> R accept(Visitor<R> visitor);
