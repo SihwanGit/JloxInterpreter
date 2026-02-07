@@ -79,6 +79,25 @@ abstract class Expr {
         final Token paren;
         final List<Expr> arguments;
     }
+
+    //get 표현식
+    //얘는 12.4절에 프로퍼티 엑세스를 설명하면서 나온다.
+    //나중에 다시 나오니 알아만 두샘.
+    static class Get extends Expr {
+        Get(Expr object, Token name) {
+            this.object = object;
+            this.name = name;
+            //입력 get은
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGetExpr(this);
+        }
+
+        final Expr object;
+        final Token name;
+    }
     
     abstract <R> R accept(Visitor<R> visitor);
 }
