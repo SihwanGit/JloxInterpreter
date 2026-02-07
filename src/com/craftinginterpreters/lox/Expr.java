@@ -87,7 +87,6 @@ abstract class Expr {
         Get(Expr object, Token name) {
             this.object = object;
             this.name = name;
-            //입력 get은
         }
 
         @Override
@@ -97,6 +96,21 @@ abstract class Expr {
 
         final Expr object;
         final Token name;
+    }
+
+    // 그룹핑 표현식
+    static class Grouping extends Expr {
+        Grouping(Expr expression) {
+            this.expression = expression;
+            // ( )는 고정이고 그 사이에 expression이 나오는 형태
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGroupingExpr(this);
+        }
+
+        final Expr expression;
     }
     
     abstract <R> R accept(Visitor<R> visitor);
