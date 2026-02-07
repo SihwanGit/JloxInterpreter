@@ -3,7 +3,7 @@ package com.craftinginterpreters.lox;
 //5.4장 pretty print를 위한 AST 출력기 생성
 //연산자 우선순위나 AST가 제대로 생성됐는지를 검사하는 디버거
 //Expr 추상 클래스는 부록 2에 나온다.
-public class AstPrinter implements Expr.Vistor<String>{
+public class AstPrinter implements Expr.Visitor<String>{
     String print(Expr expr) {
         return expr.accept(this);
     }
@@ -74,7 +74,4 @@ public class AstPrinter implements Expr.Vistor<String>{
 
         System.out.println(new AstPrinter().print(expression));
     }
-
-
-
 }
