@@ -61,6 +61,24 @@ abstract class Expr {
         final Token operator;
         final Expr right;
     }
+
+    //호출 표현식
+    static class Call extends Expr {
+        Call(Expr callee, Token paren, List<Expr> arguments) {
+            this.callee = callee;
+            this.paren = paren;
+            this.arguments = arguments;
+            // 함수 호출은 이름(callee) + 괄호 + 실인자 형태
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitCallExpr(this);
+        }
+        final Expr callee;
+        final Token paren;
+        final List<Expr> arguments;
+    }
     
     abstract <R> R accept(Visitor<R> visitor);
 }
