@@ -25,10 +25,13 @@ abstract class Expr {
     }
     
     //여기에 각 Expr들이 들어간다.
+
+    //할당 표현식
     static class Assign extends Expr {
         Assign(Token name, Expr value) {
             this.name = name;
             this.value = value;
+            //할당문은 변수와 값으로 구성
         }
 
         @Override
@@ -37,6 +40,26 @@ abstract class Expr {
         }
         final Token name;
         final Expr value;
+    }
+
+    //이항 표현식
+    static class Binary extends Expr {
+        Binary(Expr left, Token operator, Expr right) {
+            this.left = left;
+            this.operator = operator;
+            this.right = right;
+            // 이항 연산은 left op right 형태.
+            // 할당은 op가 =으로 고정되어 있지만, 얘는 +-*/ 다 가능
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBinaryExpr(this);
+        }
+
+        final Expr left;
+        final Token operator;
+        final Expr right;
     }
     
     abstract <R> R accept(Visitor<R> visitor);
