@@ -81,7 +81,8 @@ abstract class Expr {
 
     //get 표현식
     //얘는 12.4절에 프로퍼티 엑세스를 설명하면서 나온다.
-    //나중에 다시 나오니 알아만 두샘.
+    //간단히 다루자면, 클래스의 객체를 사용할 때 '객체이름.매서드' 할 때의 .역할임.
+    //객체들의 맴버를 호출하는 역할.
     static class Get extends Expr {
         Get(Expr object, Token name) {
             this.object = object;
@@ -125,6 +126,24 @@ abstract class Expr {
         }
 
         final Object value;
+    }
+
+    //논리 표현식
+    static class Logical extends Expr {
+        Logical(Expr left, Token operator, Expr right) {
+            this.left = left;
+            this.operator = operator;
+            this.right = right;
+            //논리식은 right 논리연산op right로 구성
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitLogicalExpr(this);
+        }
+        final Expr left;
+        final Token operator;
+        final Expr right;
     }
     
     abstract <R> R accept(Visitor<R> visitor);
