@@ -145,6 +145,24 @@ abstract class Expr {
         final Token operator;
         final Expr right;
     }
+
+    //set 표현식
+    //get과 마찬가지로 12.4절의 프로퍼티 부분에서 나오는 내용이다.
+    //get이 프로퍼티 엑세스였다면, set은 프로퍼티 할당의 표현식이다
+    static class Set extends Expr {
+        Set(Expr object, Token name, Expr value) {
+            this.object = object;
+            this.name = name;
+            this.value = value;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitSetExpr(this);
+        }
+        final Expr object;
+        final Token name;
+        final Expr value;
+    }
     
     abstract <R> R accept(Visitor<R> visitor);
 }
