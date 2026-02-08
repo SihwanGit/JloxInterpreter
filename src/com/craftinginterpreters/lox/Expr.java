@@ -205,6 +205,19 @@ abstract class Expr {
         final Token operator;
         final Expr right;
     }
+
+    //variable Expression
+    //8.2.1절에서 소개된 변수 엑세스 표현식
+    static class Variable extends Expr {
+        Variable(Token name) {
+            this.name = name;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableExpr(this);
+        }
+        final Token name;
+    }
     
     abstract <R> R accept(Visitor<R> visitor);
 }
