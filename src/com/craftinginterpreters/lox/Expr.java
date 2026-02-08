@@ -163,6 +163,23 @@ abstract class Expr {
         final Token name;
         final Expr value;
     }
+
+    //super Expression
+    //13.3절에 나오는 super 표현식이다.
+    static class Super extends Expr {
+        Super(Token keyword, Token method) {
+            this.keyword = keyword;
+            this.method = method;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitSuperExpr(this);
+        }
+        final Token keyword;
+        final Token method;
+    }
+
+
     
     abstract <R> R accept(Visitor<R> visitor);
 }
