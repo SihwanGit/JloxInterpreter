@@ -179,7 +179,18 @@ abstract class Expr {
         final Token method;
     }
 
-
+    //this 표현식
+    //12.6절에 나오는 this Expression이다.
+    static class This extends Expr {
+        This(Token keyword) {
+            this.keyword = keyword;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitThisExpr(this);
+        }
+        final Token keyword;
+    }
     
     abstract <R> R accept(Visitor<R> visitor);
 }
