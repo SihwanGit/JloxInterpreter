@@ -2,11 +2,15 @@ package com.craftinginterpreters.lox;
 
 import java.util.List;
 
-// 부록2, 교재 진도상으론 5.2와 5.3 사이에 들어간다.
-// Expr 매서드 구현
-
+// 부록2 Expr 매서드 구현
 //Expr은 파싱 단계에서 나오는 문법 중 Expr 문법에 속하는 애들을 한번에 묶어서 처리하기 위한 공통 루트 클래스다.
-abstract class Expr { 
+abstract class Expr {
+
+    //부록2에 나온 Expr 클래스는 13장 내용까지 전부 확장된 형태로,
+    //이걸 그대로 사용하면 5장의 prettyPrinter가 고장난다.
+    //그래서 임시방편으로 default를 사용해서 필요한 것만 오버라이딩 되게 만들었다.
+    //나중에 13장까지 전부 구현하면 아래의 인터페이스는 지우고 주석친 부분을 복구해라.
+    /*
     interface Visitor<R> {
         R visitAssignExpr(Assign expr);
         R visitBinaryExpr(Binary expr);
@@ -23,7 +27,49 @@ abstract class Expr {
         R visitUnaryExpr(Unary expr);
         R visitVariableExpr(Variable expr);
     }
-    
+    */
+
+    //해당 인터페이스는 13장까지 구현이 끝나면 지우샘.
+    interface Visitor<R> {
+        default R visitAssignExpr(Assign expr) {
+            throw new UnsupportedOperationException("visitAssignExpr not supported in this visitor.");
+        }
+        default R visitBinaryExpr(Binary expr) {
+            throw new UnsupportedOperationException("visitBinaryExpr not supported in this visitor.");
+        }
+        default R visitCallExpr(Call expr) {
+            throw new UnsupportedOperationException("visitCallExpr not supported in this visitor.");
+        }
+        default R visitGetExpr(Get expr) {
+            throw new UnsupportedOperationException("visitGetExpr not supported in this visitor.");
+        }
+        default R visitGroupingExpr(Grouping expr) {
+            throw new UnsupportedOperationException("visitGroupingExpr not supported in this visitor.");
+        }
+        default R visitLiteralExpr(Literal expr) {
+            throw new UnsupportedOperationException("visitLiteralExpr not supported in this visitor.");
+        }
+        default R visitLogicalExpr(Logical expr) {
+            throw new UnsupportedOperationException("visitLogicalExpr not supported in this visitor.");
+        }
+        default R visitSetExpr(Set expr) {
+            throw new UnsupportedOperationException("visitSetExpr not supported in this visitor.");
+        }
+        default R visitSuperExpr(Super expr) {
+            throw new UnsupportedOperationException("visitSuperExpr not supported in this visitor.");
+        }
+        default R visitThisExpr(This expr) {
+            throw new UnsupportedOperationException("visitThisExpr not supported in this visitor.");
+        }
+        default R visitUnaryExpr(Unary expr) {
+            throw new UnsupportedOperationException("visitUnaryExpr not supported in this visitor.");
+        }
+        default R visitVariableExpr(Variable expr) {
+            throw new UnsupportedOperationException("visitVariableExpr not supported in this visitor.");
+        }
+    }
+
+
     //여기에 각 Expr들이 들어간다.
 
     //할당 표현식
