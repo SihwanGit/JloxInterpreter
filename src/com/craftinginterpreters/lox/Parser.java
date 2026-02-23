@@ -39,4 +39,16 @@ public class Parser {
 
         return expr;
     }
+
+    //6.2 매치 매서드
+    //다음에 나오는 토큰이 문법이 요구하는 토큰인지 검사하는 조건부 룩어헤드
+    private boolean match(TokenType... types) { //같은 타입의 매개변수가 여러개 가능하면 이렇게 쓰는구나
+        for(TokenType type : types) {
+            if(check(type)) { //만약 type이 내가 찾는 토큰 타입들에 속한다면
+                advance(); //소비시키고 true 반환
+                return true;
+            }
+        }
+        return false; //없으면 false 반환
+    }
 }
