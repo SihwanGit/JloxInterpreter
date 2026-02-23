@@ -59,4 +59,13 @@ public class Parser {
         //룩어헤드인 peek를 통해 다음에 나올 토큰이 매개변수로 받은 토큰과 동일한지 체크
         //만약에 match의 types가 전부 끝나버린다면, isAtEnd()가 true가 되면서 check는 false를 리턴한다.
     }
+
+    //6.2 advance method for consuming Token Stream
+    private Token advance() {
+        if(!isAtEnd()) current++; //until Token Stream is EOF, consume Token
+        return previous();
+    }
+    //4장에서 한 Scanner의 advance랑 똑같으니 설명은 생략
+
+
 }
