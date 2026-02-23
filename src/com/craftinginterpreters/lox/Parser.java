@@ -20,4 +20,23 @@ public class Parser {
     private Expr expression() {
         return equality();
     }
+
+    // 6.2 동등식 : equality -> comparison ( ( "!=" | "==" ) comparison ) *
+    private Expr equality() {
+        Expr expr = comparison(); //먼저 비교식으로 시작
+
+        //( )*은 0번 이상 반복을 의미하며, while로 구현한다.
+        while (match(BANG_EQUAL, EQUAL_EQUAL)) { //만약 첫 comparison 뒤에 !=이나 ==이 오면
+            Token operator = previous(); //op는 해당 연산자로 설정하고,
+            Expr right = comparison(); //right는 그 뒤에 나오는 비교문으로 설정한다.
+            expr = new Expr.Binary(expr, operator, right); //그리고 com op com을 하나의 Expr로 묶은뒤 반복한다.
+        }
+        //아직 match, previous은 구현하지 않았다.
+        //4장의 Scanner 구현을 미루어봤을 떄, match는 다음 토큰이 문법에서 요구하는 토큰이 맞는지 검사하는
+        //조건부 룩어헤드 메서드다. 맞다면 advance로 소모하기 때문에 previous라는 이전 토큰을 가리키는
+        //매서드로 방금 소모된 토큰을 op를 설정해준다.
+        //또한 두번쨰 comparison부터는 right지만 처음은 left가 아닌 expr로 명명한 이유는 com이 하나만 올 수도 있기 때문이다.
+
+        return expr;
+    }
 }
