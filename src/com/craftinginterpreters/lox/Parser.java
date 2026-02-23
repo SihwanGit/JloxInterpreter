@@ -44,11 +44,19 @@ public class Parser {
     //다음에 나오는 토큰이 문법이 요구하는 토큰인지 검사하는 조건부 룩어헤드
     private boolean match(TokenType... types) { //같은 타입의 매개변수가 여러개 가능하면 이렇게 쓰는구나
         for(TokenType type : types) {
-            if(check(type)) { //만약 type이 내가 찾는 토큰 타입들에 속한다면
+            if(check(type)) { //만약 check(type)이 내가 찾는 토큰 타입들에 속한다면
                 advance(); //소비시키고 true 반환
                 return true;
             }
         }
         return false; //없으면 false 반환
+    }
+
+    // 6.2 check method
+    private boolean check(TokenType type) {
+        if(isAtEnd()) return false;
+        return peek().type == type;
+        //룩어헤드인 peek를 통해 다음에 나올 토큰이 매개변수로 받은 토큰과 동일한지 체크
+        //만약에 match의 types가 전부 끝나버린다면, isAtEnd()가 true가 되면서 check는 false를 리턴한다.
     }
 }
