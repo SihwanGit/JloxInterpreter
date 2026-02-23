@@ -67,5 +67,18 @@ public class Parser {
     }
     //4장에서 한 Scanner의 advance랑 똑같으니 설명은 생략
 
+    private boolean isAtEnd() {
+        return peek().type == EOF;
+        //if next token is EOF, return true
+    }
 
+    private Token peek() {
+        return tokens.get(current);
+        //다음 토큰을 읽되, 소비하지는 않은 LOOKAHEAD 매서드
+    }
+
+    private Token previous() {
+        return tokens.get(current-1);
+        //peek는 다음 토큰을 읽어주고, previous는 이미 읽은 현재 토큰을 반환
+    }
 }
