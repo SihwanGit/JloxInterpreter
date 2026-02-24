@@ -130,5 +130,23 @@ public class Parser {
         return primary();
     } //만약 not이나 -가 나오면 그걸 Unary로 묶어서 처리하고, 없으면 그냥 수식을 진행해라.
 
+    //6.2 기본식 : primary -> number | string | "true" | "false" | "nil" | "(" expression ")"
+    private Expr primary() {
+        //true, false, nil은 토큰이 있으니 그걸로 처리
+        if(match(FALSE)) return new Expr.Literal(false);
+        if(match(TRUE)) return new Expr.Literal(true);
+        if(match(NIL))  return new Expr.Literal(null);
 
+        //숫자와 문자열은 리터럴로 처리
+        if(match(NUMBER, STRING)) {
+            return new Expr.Literal(previous().literal);
+        }
+
+        //여는 괄호가 나오면 위에서 했던 대로 하면 됨.
+        //다만 primary는 연산자의 접합이 없기 때문에 while이 아니라 if를 사용한다
+        if(match(LEFT_PAREN)) {
+            Expr expr = expression();
+            consume()
+        }
+    }
 }
