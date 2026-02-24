@@ -146,7 +146,10 @@ public class Parser {
         //다만 primary는 연산자의 접합이 없기 때문에 while이 아니라 if를 사용한다
         if(match(LEFT_PAREN)) {
             Expr expr = expression();
-            consume()
+            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            return new Expr.Grouping(expr);
         }
+        //여는 괄호의 뒤에는 반드시 닫는 괄호가 나와야한다.
+        //따라서 consume을 사용하여 RIGHT_PAREN을 검사하고 나오지 않으면 에러로 처리한다.
     }
 }
