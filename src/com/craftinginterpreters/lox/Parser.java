@@ -79,6 +79,20 @@ public class Parser {
 
     private Token previous() {
         return tokens.get(current-1);
-        //peek는 다음 토큰을 읽어주고, previous는 이미 읽은 현재 토큰을 반환
+        //peek는 다음 토큰을 읽어주고, previous는 직전에 소비된 토큰을 반환
     }
+
+    // 6.2 비교식 : comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
+    private Expr comparison() {
+        Expr expr = term();
+
+        while(match(GREATER_EQUAL, GREATER, LESS, LESS_EQUAL)) {
+            Token operator = previous();
+            Expr right = term();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+    //realization is similar to equality
 }
