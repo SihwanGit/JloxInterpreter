@@ -118,4 +118,17 @@ public class Parser {
         }
         return expr;
     }
+
+    //6.2 단항연산 : unary -> ( "!" | "-" ) unary | primary
+    private Expr unary() {
+        if(match(BANG, MINUS)) {
+            Token operator = previous();
+            Expr right = unary();
+            return new Expr.Unary(operator, right);
+        }
+
+        return primary();
+    } //만약 not이나 -가 나오면 그걸 Unary로 묶어서 처리하고, 없으면 그냥 수식을 진행해라.
+
+
 }
