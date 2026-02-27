@@ -78,5 +78,6 @@ public class Lox {
             report(token.line, " at '" + token.lexeme + "'", message);
         }
     }
+    //에러가 난 토큰의 줄번호와 렉심을 반환한다.
 
 }

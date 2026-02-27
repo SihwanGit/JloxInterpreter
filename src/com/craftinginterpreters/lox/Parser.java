@@ -7,6 +7,8 @@ import static com.craftinginterpreters.lox.TokenType.*;
 public class Parser {
     private static class ParseError extends RuntimeException {
     }
+    //파서를 해체(unwind)하려고 사용하는 센티널 클래스다.
+    //파서 내부의 호출자 메서드로 해체 여부를 스스로 결정한다
 
     private final List<Token> tokens;
     //6.2 파서도 스캐너처럼 나열된 입력을 소비한다.
@@ -95,9 +97,12 @@ public class Parser {
 
     //6.3 error 리포트 매서드
     private ParseError error(Token token, String message) {
-        Lox.error(token, message);
+        Lox.error(token, message); //해당 코드를 Lox.java에 추가
         return new ParseError();
-    } //근데 이거 ParseError이 어디에 나오는 거지?
+    } //에러가 발생하면 parseError 객체를 생성한다.
+    //에러를 throw하지 않고 return으로 처리하는 이유는 해체 여부를 스스로 결정하기 위해서다.
+    //예를들어 어떤 에러는 파서를 이상한 상태로 만들지 않고, 동기화가 필요없는 점에서 생긴다.
+    //이 경우 그냥 에러를 리포트하고 갈 길을 간다. Ex : 함수에 너무 많은 메서드가 들어오는 경우 등
 
     // 6.2 비교식 : comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
     private Expr comparison() {
