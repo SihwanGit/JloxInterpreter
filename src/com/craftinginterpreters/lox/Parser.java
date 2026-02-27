@@ -5,6 +5,9 @@ import static com.craftinginterpreters.lox.TokenType.*;
 
 // 6.2장 : Parser 클래스
 public class Parser {
+    private static class ParseError extends RuntimeException {
+    }
+
     private final List<Token> tokens;
     //6.2 파서도 스캐너처럼 나열된 입력을 소비한다.
     //그러나 스캐너는 source code string을 읽으며, 파서는 토큰 스트림을 읽는다.
@@ -52,13 +55,13 @@ public class Parser {
         return false; //없으면 false 반환
     }
 
-    //6.3 패닉 모드 진입
+    //6.3 다음 토큰이 기대하는 타입인지 체크하는 로직
     private Token consume(TokenType type, String message) {
         if(check(type)) return advance();
         throw error(peek(), message);
     }
     //매개변수로 받은 토큰이 나왔는지 검사하고, 안나왔으면 에러 메세지를 송출
-
+    //match()와 구현이 유사하다.
 
     // 6.2 check method
     private boolean check(TokenType type) {
@@ -89,6 +92,12 @@ public class Parser {
         return tokens.get(current-1);
         //peek는 다음 토큰을 읽어주고, previous는 직전에 소비된 토큰을 반환
     }
+
+    //6.3 error 리포트 매서드
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
+    } //근데 이거 ParseError이 어디에 나오는 거지?
 
     // 6.2 비교식 : comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
     private Expr comparison() {
