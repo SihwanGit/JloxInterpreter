@@ -52,6 +52,14 @@ public class Parser {
         return false; //없으면 false 반환
     }
 
+    //6.3 패닉 모드 진입
+    private Token consume(TokenType type, String message) {
+        if(check(type)) return advance();
+        throw error(peek(), message);
+    }
+    //매개변수로 받은 토큰이 나왔는지 검사하고, 안나왔으면 에러 메세지를 송출
+
+
     // 6.2 check method
     private boolean check(TokenType type) {
         if(isAtEnd()) return false;
@@ -97,7 +105,7 @@ public class Parser {
 
     //6.2 항 : term -> factor ( ( "+" | "-" ) factor )*
     private Expr term() {
-        Expr expr factor();
+        Expr expr = factor();
 
         while(match(MINUS, PLUS)) {
             Token operator = previous();
@@ -152,4 +160,6 @@ public class Parser {
         //여는 괄호의 뒤에는 반드시 닫는 괄호가 나와야한다.
         //따라서 consume을 사용하여 RIGHT_PAREN을 검사하고 나오지 않으면 에러로 처리한다.
     }
+
+
 }
