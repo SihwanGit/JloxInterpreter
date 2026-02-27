@@ -180,7 +180,7 @@ abstract class Expr {
             this.left = left;
             this.operator = operator;
             this.right = right;
-            //논리식은 right 논리연산op right로 구성
+            //논리식은 left 논리연산op right로 구성
         }
 
         @Override

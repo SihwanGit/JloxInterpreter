@@ -104,6 +104,30 @@ public class Parser {
     //예를들어 어떤 에러는 파서를 이상한 상태로 만들지 않고, 동기화가 필요없는 점에서 생긴다.
     //이 경우 그냥 에러를 리포트하고 갈 길을 간다. Ex : 함수에 너무 많은 메서드가 들어오는 경우 등
 
+    private void synchronize() {
+        advance(); //일단 한번은 소비
+
+        //동기화는 ; } \n같은 문장의 끝부분과, CLASS, FUN 등 새 문장이 시작되는 부분에서 이루어진다.
+        //에러가 난 라인을 무시하고 새 문장이 시작할 것 같은 지점에서 다시 Parsing을 이어가는 것이다.
+        while(!isAtEnd()) {
+            if(previous().type == SEMICOLON) return;
+
+            switch(peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+            }
+            advance(); //경계가 되지 않는 토큰들은 그냥 소비 (계단식 에러가 일어나는 부분은 자연스럽게 제거됨)
+        }
+    }
+    //참고로 6장 시점에선 해당 메서드를 사용하지 않는다. 자세한건 8장부터 다룬다고 한다.
+
     // 6.2 비교식 : comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
     private Expr comparison() {
         Expr expr = term();
