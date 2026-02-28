@@ -5,8 +5,7 @@ import static com.craftinginterpreters.lox.TokenType.*;
 
 // 6.2장 : Parser 클래스
 public class Parser {
-    private static class ParseError extends RuntimeException {
-    }
+    private static class ParseError extends RuntimeException { }
     //파서를 해체(unwind)하려고 사용하는 센티널 클래스다.
     //파서 내부의 호출자 메서드로 해체 여부를 스스로 결정한다
 
@@ -19,6 +18,17 @@ public class Parser {
     Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
+
+    //6.4 method for starting parser
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        }
+    }
+    //6장 기준으로 Expression밖에 구현이 안되어 있는 상태고, Stmt를 추가하면 수정할 예정
+    //6장 기준 단일식 파싱 기능만 있다.
 
     // 6.2 록스 언어의 연산자 문법은 6.1장을 참고.
     // expression 중 가장 상위 계층(우선순위가 가장 낮은)인 동등식부터 파생된다.
