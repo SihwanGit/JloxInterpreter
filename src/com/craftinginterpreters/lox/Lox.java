@@ -53,10 +53,21 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens(); //입력된 토큰들을 리스트에 저장
 
+        //6.4 Expression Parsing
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
+
+        //6.4 구문 에러 시 정지
+        if(hadError) return;
+
+        // 6.4 기준 단순 토큰 출력에서 AST 출력으로 기능을 바꿈. 주석처리 할테니 쓰고 싶으면 쓰샘.
         //지금은 단순히 토큰을 출력한다.
         for(Token token : tokens) {
             System.out.println(token); //토큰 출력 (토큰Type, text, 리터럴의 쌍으로 출력됨. Token 클래스에서 그렇게 정의함)
         }
+
+        //6.4 expression의 AST 출력
+        System.out.println(new AstPrinter().print(expression));
     }
 
     static void error(int line, String message) { //4.1장 error를 관리하는 함수
