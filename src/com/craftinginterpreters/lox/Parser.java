@@ -197,6 +197,9 @@ public class Parser {
         }
         //여는 괄호의 뒤에는 반드시 닫는 괄호가 나와야한다.
         //따라서 consume을 사용하여 RIGHT_PAREN을 검사하고 나오지 않으면 에러로 처리한다.
+
+        throw error(peek(), "Expect expression. ");
+        //매치되는 표현식이 하나도 없어서 표현식을 시작할 수 없는 경우에 대한 에러처리
     }
 
 
