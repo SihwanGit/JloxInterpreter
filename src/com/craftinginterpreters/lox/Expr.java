@@ -6,30 +6,7 @@ import java.util.List;
 //Expr은 파싱 단계에서 나오는 문법 중 Expr 문법에 속하는 애들을 한번에 묶어서 처리하기 위한 공통 루트 클래스다.
 abstract class Expr {
 
-    //부록2에 나온 Expr 클래스는 13장 내용까지 전부 확장된 형태로,
-    //이걸 그대로 사용하면 5장의 prettyPrinter가 고장난다.
-    //그래서 임시방편으로 default를 사용해서 필요한 것만 오버라이딩 되게 만들었다.
-    //나중에 13장까지 전부 구현하면 아래의 인터페이스는 지우고 주석친 부분을 복구해라.
-    /*
-    interface Visitor<R> {
-        R visitAssignExpr(Assign expr);
-        R visitBinaryExpr(Binary expr);
-        R visitCallExpr(Call expr);
-        R visitGetExpr(Get expr);
-
-        R visitGroupingExpr(Grouping expr);
-        R visitLiteralExpr(Literal expr);
-        R visitLogicalExpr(Logical expr);
-        R visitSetExpr(Set expr);
-
-        R visitSuperExpr(Super expr);
-        R visitThisExpr(This expr);
-        R visitUnaryExpr(Unary expr);
-        R visitVariableExpr(Variable expr);
-    }
-    */
-
-    //해당 인터페이스는 13장까지 구현이 끝나면 지우샘.
+    //비지터 인터페이스
     interface Visitor<R> {
         default R visitAssignExpr(Assign expr) {
             throw new UnsupportedOperationException("visitAssignExpr not supported in this visitor.");
@@ -66,6 +43,10 @@ abstract class Expr {
         }
         default R visitVariableExpr(Variable expr) {
             throw new UnsupportedOperationException("visitVariableExpr not supported in this visitor.");
+        }
+        //6장 연습문제 2번 삼항연산자 ternary
+        default R visitTernaryExpr(Ternary expr) {
+            throw new UnsupportedOperationException("visitTernaryExpr not supported in this visitor.");
         }
     }
 
@@ -265,6 +246,22 @@ abstract class Expr {
             return visitor.visitVariableExpr(this);
         }
         final Token name;
+    }
+
+    //6장 연습문제 2번 삼항연산자 Ternary
+    static class Ternary extends Expr {
+        Ternary(Expr condition, Expr thenBranch, Expr elseBranch) {
+            this.condition = condition;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+            // ternary는 condition ? thenBranch : elseBranch로 구성되어 있다.
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) { return visitor.visitTernaryExpr(this); }
+
+        final Expr condition;
+        final Expr thenBranch;
+        final Expr elseBranch;
     }
     
     abstract <R> R accept(Visitor<R> visitor);

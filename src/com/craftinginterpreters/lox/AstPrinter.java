@@ -37,6 +37,13 @@ public class AstPrinter implements Expr.Visitor<String>{
         //단항 연산자들은 op와 operand를 괄호로 묶어 출력
     }
 
+    //6장 연습문제 2번 : ternary 출력
+    @Override
+    public String visitTernaryExpr(Expr.Ternary expr) {
+        return parenthesize("?:", expr.condition, expr.thenBranch, expr.elseBranch);
+        //삼항연산자는 ?: 조건 if else 순으로 출력한다.
+    }
+
     //5.4장 AST로 구성된 수식의 양 끝을 ( )로 묶는 매서드
     // (name Expr...) 과 같은 형태로 출력된다.
     // name은 위 visit 매서드들의 op와 "group" 부분에 해당한다.
