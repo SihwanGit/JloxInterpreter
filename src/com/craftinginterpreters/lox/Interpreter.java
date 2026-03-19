@@ -38,6 +38,7 @@ class Interpreter implements Expr.Visitor<Object> {
         switch (expr.operator.type) {
             case BANG:
                 return !isTruthy(right);
+                // 우변에 불리안이 오지 않는 경우에 대비한 에러처리와 암묵적 변환을 지원한다
             case MINUS:
                 return -(double)right;
             // -연산자를 적용하려면 피연산자가 숫자여야한다.
@@ -47,7 +48,16 @@ class Interpreter implements Expr.Visitor<Object> {
         }
         //실행되지 않는 코드
         return null;
+    }
 
+    //7.2 암묵적 변환을 실시하는 매서드
+    private boolean isTruthy(Object object) {
+        if(object == null) return false;
+        if(object instanceof Boolean) return (boolean)object;
+        //타입이 불리안이면 그 값 그대로 리턴
+        return true;
+        //Lox언어는 null만 false와 null은 false로, 나머지는 전부 true로 한다.
+        //이는 루비 규칙과 같다.
     }
 
 
