@@ -60,6 +60,12 @@ class Interpreter implements Expr.Visitor<Object> {
         //이는 루비 규칙과 같다.
     }
 
+    private boolean isEqual(Object a,  Object b) {
+        if(a == null && b == null) return true; //둘 다 널이면 true
+        if(a==null) return false; //a가 널이면 false
+        return a.equals(b); //나머지는 eqaul로 같은지 검사해서 결과 반환
+    }
+
     //7.2 이항연산자 평가
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
@@ -102,7 +108,6 @@ class Interpreter implements Expr.Visitor<Object> {
             // plus는 숫자면 더하고, 문자열이면 서로 연결하기 때문에 double와 string으로 나눴다.
             // 하스켈, 펄, 루아, 스몰토크 같은 언어는 문자열 연결 연산자를 따로 정의했다고 한다.
         }
-
         // 실행되지 않는 코드
         return null;
     }
