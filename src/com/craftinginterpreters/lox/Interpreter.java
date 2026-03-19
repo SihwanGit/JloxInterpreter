@@ -23,8 +23,32 @@ class Interpreter implements Expr.Visitor<Object> {
     // grouping 노드에는 괄호 안에 포함된 내부 노드의 참조가 있다.
     // grouping은 이 서브식을 재귀적으로 평가해 리턴한다
 
+    //7.2 매개변수로 들어온 expr을 그냥 돌려보내는 헬퍼 매서드
+    //추후 lvalue / rvalue를 구현할 때도 쓰인다고 합니다
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
+
+    //7.2 단항식 평가
+    //단항식은 먼저 오른쪽 expr을 계산후 연산자가 -면 right에 -를 곱해준다.
+    @Override
+    public Object visitUnaryExpr(Expr.Unary expr) {
+        Object right = evaluate(expr.right);
+        //먼저 피연산자 right를 평가(evaluate) 후 그 결과에 단항연산자를 적용한다.
+        switch (expr.operator.type) {
+            case BANG:
+                return !isTruthy(right);
+            case MINUS:
+                return -(double)right;
+            // -연산자를 적용하려면 피연산자가 숫자여야한다.
+            //자바는 정적으로 타입을 알 수 없기 때문에 (double)로 캐스팅을 해줬다.
+            //단항연산자를 계산할 때 변수의 타입을 바꾸기 때문에 Lox가 동적 타입 언어다.
+            //캐스팅에 실패할 수도 있으니 그에 따른 에러 처리도 추가할 예정이다.
+        }
+        //실행되지 않는 코드
+        return null;
+
+    }
+
 
 }
