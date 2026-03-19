@@ -68,6 +68,21 @@ class Interpreter implements Expr.Visitor<Object> {
         //좌변과 우항의 Expr을 먼저 계산(평가)
 
         switch (expr.operator.type) {
+            case BANG_EQUAL:
+                return !isEqual(left, right);
+            case EQUAL_EQUAL:
+                return isEqual(left, right);
+            //비교 연산자는 보이는대로 계산하면 된다.
+            //산술은 입력과 타입이 같은 값을 만들어내지만,
+            //비교는 입력 타입에 관계없이 무조건 불리안 값을 만든다.
+            case GREATER:
+                return (double)left > (double)right;
+            case GREATER_EQUAL:
+                return (double)left >= (double)right;
+            case LESS:
+                return (double)left < (double)right;
+            case LESS_EQUAL:
+                return (double)left <= (double)right;
             // -/*는 그냥 피연산자끼리 계산
             // 계산과정에서 side effect가 일어나도 인지할 수 있으므로 구현상세는 아니다.
             case MINUS:
@@ -91,6 +106,8 @@ class Interpreter implements Expr.Visitor<Object> {
         // 실행되지 않는 코드
         return null;
     }
+
+
 
 
 }
