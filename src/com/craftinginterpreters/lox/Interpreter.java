@@ -60,5 +60,37 @@ class Interpreter implements Expr.Visitor<Object> {
         //이는 루비 규칙과 같다.
     }
 
+    //7.2 이항연산자 평가
+    @Override
+    public Object visitBinaryExpr(Expr.Binary expr) {
+        Object left = evaluate(expr.left);
+        Object right = evaluate(expr.right);
+        //좌변과 우항의 Expr을 먼저 계산(평가)
+
+        switch (expr.operator.type) {
+            // -/*는 그냥 피연산자끼리 계산
+            // 계산과정에서 side effect가 일어나도 인지할 수 있으므로 구현상세는 아니다.
+            case MINUS:
+                return (double)left - (double)right;
+            case SLASH:
+                return (double)left / (double)right;
+            case STAR:
+                return (double)left * (double)right;
+            case PLUS:
+                if(left instanceof Double && right instanceof Double)
+                    return (double)left + (double)right;
+                if(left instanceof String && right instanceof String)
+                    return (String)left + (String)right;
+                break;
+            // return 으로 끝나는 경우에는 break안붙여도 됨.
+            // 그런데 PLUS는 if가 둘다 false인 경우 실행이 안되니 break를 붙인다
+            // plus는 숫자면 더하고, 문자열이면 서로 연결하기 때문에 double와 string으로 나눴다.
+            // 하스켈, 펄, 루아, 스몰토크 같은 언어는 문자열 연결 연산자를 따로 정의했다고 한다.
+        }
+
+        // 실행되지 않는 코드
+        return null;
+    }
+
 
 }
