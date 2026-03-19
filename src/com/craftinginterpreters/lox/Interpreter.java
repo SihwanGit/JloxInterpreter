@@ -21,5 +21,10 @@ class Interpreter implements Expr.Visitor<Object> {
         return evaluate(expr.expression);
     }
     // grouping 노드에는 괄호 안에 포함된 내부 노드의 참조가 있다.
+    // grouping은 이 서브식을 재귀적으로 평가해 리턴한다
+
+    private Object evaluate(Expr expr) {
+        return expr.accept(this);
+    }
 
 }
