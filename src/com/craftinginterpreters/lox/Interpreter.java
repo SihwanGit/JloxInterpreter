@@ -125,11 +125,14 @@ class Interpreter implements Expr.Visitor<Object> {
                     return (double)left + (double)right;
                 if(left instanceof String && right instanceof String)
                     return (String)left + (String)right;
-                break;
+                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             // return 으로 끝나는 경우에는 break안붙여도 됨.
             // 그런데 PLUS는 if가 둘다 false인 경우 실행이 안되니 break를 붙인다
             // plus는 숫자면 더하고, 문자열이면 서로 연결하기 때문에 double와 string으로 나눴다.
             // 하스켈, 펄, 루아, 스몰토크 같은 언어는 문자열 연결 연산자를 따로 정의했다고 한다.
+                // 7.3 +는 이미 double과 string에 대한 타입검사를 수행하고
+                // checkNumberOperands 매서드를 쓸 필요 없이 직접 number도 string도 아닌 케이스에 대한 에러를 삽입함.
+                // 기존에는 에러처리가 없어서 break를 썼어야했지만 이제는 지워도 됨.
         }
         // 실행되지 않는 코드
         return null;
