@@ -40,6 +40,7 @@ class Interpreter implements Expr.Visitor<Object> {
                 return !isTruthy(right);
                 // 우변에 불리안이 오지 않는 경우에 대비한 에러처리와 암묵적 변환을 지원한다
             case MINUS:
+                checkNumberOperand(expr.operator, right);
                 return -(double)right;
             // -연산자를 적용하려면 피연산자가 숫자여야한다.
             //자바는 정적으로 타입을 알 수 없기 때문에 (double)로 캐스팅을 해줬다.
@@ -64,6 +65,14 @@ class Interpreter implements Expr.Visitor<Object> {
         if(a == null && b == null) return true; //둘 다 널이면 true
         if(a==null) return false; //a가 널이면 false
         return a.equals(b); //나머지는 eqaul로 같은지 검사해서 결과 반환
+    }
+
+    //7.3 지금까지의 에러처리는 문법이나 토큰같은 정적인 에러였다.
+    //그러나 이제부터는 런타임 에러를 다룬다.
+    //해당 checkNumberOperand 매서드는 피연산자의 타입이 숫자인지 따지고, 아니면 에러처리한다.
+    private void checkNumberOperand(Token operator, Object operand) {
+        if(operand instanceof Double) return;
+        throw new RuntimeError(operator, "Operand must be a number");
     }
 
     //7.2 이항연산자 평가
@@ -111,8 +120,5 @@ class Interpreter implements Expr.Visitor<Object> {
         // 실행되지 않는 코드
         return null;
     }
-
-
-
 
 }
