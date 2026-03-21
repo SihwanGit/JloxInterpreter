@@ -75,6 +75,12 @@ class Interpreter implements Expr.Visitor<Object> {
         throw new RuntimeError(operator, "Operand must be a number");
     }
 
+    //7.3 이항연산자의 체크넘버
+    private void checkNumberOperands(Token operator, Object left, Object right) {
+        if(left instanceof Double && right instanceof Double) return; //두 피연산자가 모두 Number면 정상
+        throw new RuntimeError(operator, "Operands must be numbers");
+    } //해당 코드는 Double인지만 체크해서 +의 String 접합은 체크 못함.
+
     //7.2 이항연산자 평가
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
