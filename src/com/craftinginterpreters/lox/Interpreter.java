@@ -82,6 +82,7 @@ class Interpreter implements Expr.Visitor<Object> {
     } //해당 코드는 Double인지만 체크해서 +의 String 접합은 체크 못함.
 
     //7.2 이항연산자 평가
+    //7.3 사칙연산과 비교연산에서 피연산자가 Double이 아닌 경우에 대한 에러 추가
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.left);
@@ -97,20 +98,27 @@ class Interpreter implements Expr.Visitor<Object> {
             //산술은 입력과 타입이 같은 값을 만들어내지만,
             //비교는 입력 타입에 관계없이 무조건 불리안 값을 만든다.
             case GREATER:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left > (double)right;
             case GREATER_EQUAL:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left >= (double)right;
             case LESS:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left < (double)right;
             case LESS_EQUAL:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left <= (double)right;
             // -/*는 그냥 피연산자끼리 계산
             // 계산과정에서 side effect가 일어나도 인지할 수 있으므로 구현상세는 아니다.
             case MINUS:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left - (double)right;
             case SLASH:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left / (double)right;
             case STAR:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left * (double)right;
             case PLUS:
                 if(left instanceof Double && right instanceof Double)
