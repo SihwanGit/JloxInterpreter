@@ -3,6 +3,20 @@ package com.craftinginterpreters.lox;
 class Interpreter implements Expr.Visitor<Object> {
     // 7.2 인터프리터도 AstPrinter처럼 비지터 패턴으로 구현
 
+
+    //7.4 인터프리터 매서드
+    void interpret(Expr expression) {
+        try {
+            Object value = evaluate(expression);
+            System.out.println(stringify(value));
+        } catch (RuntimeError error) {
+            Lox.runtimeError(error);
+        }
+    }
+    // Expr에 대한 구문 트리를 가져와 평가.
+    // 성공시 evaluate의 결과값을 해당 객체에게 리턴
+    // 그 후 사용자에게 해당 값을 문자열로 변환해 보여준다.
+
     // 7.2 리터럴 평가
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
@@ -66,6 +80,23 @@ class Interpreter implements Expr.Visitor<Object> {
         if(a==null) return false; //a가 널이면 false
         return a.equals(b); //나머지는 eqaul로 같은지 검사해서 결과 반환
     }
+
+    //7.4 록스 값을 문자열로 변환하는 매서드
+    private String stringify(Object object) {
+        if(object == null) return "nil";
+
+        if(object instanceof Double) { //실수면 문자열로 변환
+            String text = object.toString();
+            if(text.endsWith(".0")) {
+                text = text.substring(0, text.length()-2);
+            } //만약 실수가 2.0처럼 .0으로 끝나면 .과 0은 출력하지 않는다.
+            //록스는 정수타입이 없어서 실수도 정수로 계산하기 떄문에 소수점을 지워주는 부분을 추가했다.
+            return text;
+        }
+
+        return object.toString();
+    }
+
 
     //7.3 지금까지의 에러처리는 문법이나 토큰같은 정적인 에러였다.
     //그러나 이제부터는 런타임 에러를 다룬다.

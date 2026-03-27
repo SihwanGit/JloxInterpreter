@@ -10,6 +10,11 @@ import java.util.List;
 
 public class Lox {
     static boolean hadError = false; //4.1 에러 여부 체크
+    static boolean hadRuntimeError= false; //7.4 runtime error check
+
+    private static final Interpreter interpreter = new Interpreter();
+    // 7.4 REPL 내부에서 run을 사용해도 동일한 인터프리터를 재사용할 수 있게끔 정적 필드로 지정
+    // 나중에 인터프리터에 글로벌 변수를 넣으면 REPL이 종료될 때까지 유지해야되기 때문에 필요하다.
 
     public static void main(String[] args) throws IOException {
         if(args.length > 1) { //4장. 입력된 문장이 1보다 크다면
@@ -19,6 +24,7 @@ public class Lox {
             runFile(args[0]);
         } else {
             runPrompt(); //프롬프트에 입력
+            //7.4 REPL(레블) 형식은 runtimeError를 처리할 필요가 없다.
         }
     }
 
@@ -29,7 +35,7 @@ public class Lox {
 
         //4.1장 종료 코드로 에러를 식별한다.
         if(hadError) System.exit(65); //파일을 받고나서 에러가 있으면 종료.
-        //이 코드의 위치가 여기가 아닐 수 있는데 그건 나중에 수정하면 됨.
+        if(hadRuntimeError) System.exit(70);
     }
 
     //4장. Jlox를 기동할 때 파일이 아닌 프롬프트로 직접 입력해 실행
@@ -57,17 +63,23 @@ public class Lox {
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
 
+        //7.4 interpreter는 파서나 스캐너와는 달리 정적필드로 지정을 해둬서.
+        //run 내부에서 만들 필요가 없음
+
         //6.4 구문 에러 시 정지
         if(hadError) return;
 
-        // 6.4 기준 단순 토큰 출력에서 AST 출력으로 기능을 바꿈. 주석처리 할테니 쓰고 싶으면 쓰샘.
-        //지금은 단순히 토큰을 출력한다.
+        //4장 토큰출력
         for(Token token : tokens) {
             System.out.println(token); //토큰 출력 (토큰Type, text, 리터럴의 쌍으로 출력됨. Token 클래스에서 그렇게 정의함)
         }
 
         //6.4 expression의 AST 출력
         System.out.println(new AstPrinter().print(expression));
+
+        //7.4 expression의 결과값 출력
+        interpreter.interpret(expression);
+        //이것으로 스캐닝+파싱+실행의 전체 언어 파이프라인 공사는 끝났다.
     }
 
     static void error(int line, String message) { //4.1장 error를 관리하는 함수
@@ -90,5 +102,12 @@ public class Lox {
         }
     }
     //에러가 난 토큰의 줄번호와 렉심을 반환한다.
+
+
+    //7.4 runtime error reporting
+    static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
+    }
 
 }
