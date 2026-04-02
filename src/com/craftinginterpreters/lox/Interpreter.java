@@ -96,7 +96,22 @@ class Interpreter implements Expr.Visitor<Object> {
 
         return object.toString();
     }
+    //7장 본문에서는 평가값을 문자열로 바꿔서 interprete 매서드를 통해 출력할 때 사용했지만,
+    //7장 연습문제 2번에서 문자열 변환 접합을 할 떄도 사용 가능.
+    //다만 stringify는 소수점이 .0일 경우 그걸 지워버리기 때문에 그대로 사용하면 안된다.
+    //따라서 .0을 지우는 부분만 뺴고 나머지 기능은 동일한 stringify2 매서드를 만들어서 해결했다.
 
+    private String stringify2(Object object) {
+        if(object == null) return "nil";
+
+        if(object instanceof Double) { //실수면 문자열로 변환
+            String text = object.toString();
+            return text;
+        }
+        return object.toString();
+    }
+    //7장 연습문제 2번을 위한 stringify 매서드의 수정 버전.
+    //.0이면 지우는 부분을 없앤 매서드다.
 
     //7.3 지금까지의 에러처리는 문법이나 토큰같은 정적인 에러였다.
     //그러나 이제부터는 런타임 에러를 다룬다.
@@ -159,9 +174,10 @@ class Interpreter implements Expr.Visitor<Object> {
                 //7장 연습문제 2번 : 문자열 형변환 접합 추가하기
                 //둘 중 하나가 String이면, 나머지 하나를 String으로 변환하고 문자열 접합하기
                 if(left instanceof Double && right instanceof String) //오른쪽이 String인 경우
-                    return (String)left + (String)right;
-                if(left instanceof String && right instanceof String) //왼쪽이 String인 경우
-                    return (String)left + (String)right;
+                    return stringify2(left) + (String)right;
+                if(left instanceof String && right instanceof Double) //왼쪽이 String인 경우
+                    return (String)left + stringify2(right);
+                //
 
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             // return 으로 끝나는 경우에는 break안붙여도 됨.
