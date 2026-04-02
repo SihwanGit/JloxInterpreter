@@ -156,6 +156,13 @@ class Interpreter implements Expr.Visitor<Object> {
                     return (double)left + (double)right;
                 if(left instanceof String && right instanceof String)
                     return (String)left + (String)right;
+                //7장 연습문제 2번 : 문자열 형변환 접합 추가하기
+                //둘 중 하나가 String이면, 나머지 하나를 String으로 변환하고 문자열 접합하기
+                if(left instanceof Double && right instanceof String) //오른쪽이 String인 경우
+                    return (String)left + (String)right;
+                if(left instanceof String && right instanceof String) //왼쪽이 String인 경우
+                    return (String)left + (String)right;
+
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             // return 으로 끝나는 경우에는 break안붙여도 됨.
             // 그런데 PLUS는 if가 둘다 false인 경우 실행이 안되니 break를 붙인다
