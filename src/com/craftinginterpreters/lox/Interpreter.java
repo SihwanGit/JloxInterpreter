@@ -91,6 +91,9 @@ class Interpreter implements Expr.Visitor<Object> {
                 text = text.substring(0, text.length()-2);
             } //만약 실수가 2.0처럼 .0으로 끝나면 .과 0은 출력하지 않는다.
             //록스는 정수타입이 없어서 실수도 정수로 계산하기 떄문에 소수점을 지워주는 부분을 추가했다.
+            //.0만 지워주는게 아니라 .00도 지운다.
+            //정확히 말하면 해당 매서는 .0만 지울 수 있지만 맨처음 Scanner 단계에서
+            // .00이 .0으로 변환되서 가능하다. 아무래도 자바 자체의 기능인듯 하다.
             return text;
         }
 
@@ -112,6 +115,10 @@ class Interpreter implements Expr.Visitor<Object> {
     }
     //7장 연습문제 2번을 위한 stringify 매서드의 수정 버전.
     //.0이면 지우는 부분을 없앤 매서드다.
+    //그런데 이걸 그대로 쓰니까 3을 넣으면 3.0으로 나옴.
+    //기존 건 .0을 썼는데 지우는게 문제고, 2버전은 안썼는데 추가하는게 문제네...
+
+
 
     //7.3 지금까지의 에러처리는 문법이나 토큰같은 정적인 에러였다.
     //그러나 이제부터는 런타임 에러를 다룬다.
@@ -174,10 +181,9 @@ class Interpreter implements Expr.Visitor<Object> {
                 //7장 연습문제 2번 : 문자열 형변환 접합 추가하기
                 //둘 중 하나가 String이면, 나머지 하나를 String으로 변환하고 문자열 접합하기
                 if(left instanceof Double && right instanceof String) //오른쪽이 String인 경우
-                    return stringify2(left) + (String)right;
+                    return stringify2(left) + stringify2(right);
                 if(left instanceof String && right instanceof Double) //왼쪽이 String인 경우
                     return (String)left + stringify2(right);
-                //
 
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             // return 으로 끝나는 경우에는 break안붙여도 됨.
