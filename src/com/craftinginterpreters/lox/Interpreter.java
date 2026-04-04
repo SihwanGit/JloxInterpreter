@@ -104,19 +104,12 @@ class Interpreter implements Expr.Visitor<Object> {
     //다만 stringify는 소수점이 .0일 경우 그걸 지워버리기 때문에 그대로 사용하면 안된다.
     //따라서 .0을 지우는 부분만 뺴고 나머지 기능은 동일한 stringify2 매서드를 만들어서 해결했다.
 
-    private String stringify2(Object object) {
-        if(object == null) return "nil";
-
-        if(object instanceof Double) { //실수면 문자열로 변환
-            String text = object.toString();
-            return text;
-        }
-        return object.toString();
-    }
-    //7장 연습문제 2번을 위한 stringify 매서드의 수정 버전.
-    //.0이면 지우는 부분을 없앤 매서드다.
-    //그런데 이걸 그대로 쓰니까 3을 넣으면 3.0으로 나옴.
-    //기존 건 .0을 썼는데 지우는게 문제고, 2버전은 안썼는데 추가하는게 문제네...
+    //이후 stirngify2()는 버전2를 구현하면서 삭제했다.
+    //stringify2()는 반대로 3을 입력시 3.0으로 출력되는 문제가 있었는데 이는 록스 언어의 구조적 문제점이다.
+    //록스 언어는 Double과 String 타입만 존재한다.
+    //따라서 3이던 3.0이던 위에서 언급한 3.00이던 전부 Double형 3.0으로 인식된다.
+    //이는 Scanner 레벨에서 수행되는 것으로 stringify() 매서드를 아무리 수정해도 고칠 수 없다.
+    //따라서 stringify2()는 삭제하고 stringify()를 사용하는 것으로 타협을 봤다.
 
 
 
@@ -176,14 +169,12 @@ class Interpreter implements Expr.Visitor<Object> {
             case PLUS:
                 if(left instanceof Double && right instanceof Double)
                     return (double)left + (double)right;
-                if(left instanceof String && right instanceof String)
-                    return (String)left + (String)right;
-                //7장 연습문제 2번 : 문자열 형변환 접합 추가하기
-                //둘 중 하나가 String이면, 나머지 하나를 String으로 변환하고 문자열 접합하기
-                if(left instanceof Double && right instanceof String) //오른쪽이 String인 경우
-                    return stringify2(left) + stringify2(right);
-                if(left instanceof String && right instanceof Double) //왼쪽이 String인 경우
-                    return (String)left + stringify2(right);
+                if(left instanceof String || right instanceof String)
+                    return stringify(left) + stringify(right);
+                //7장 연습문제 2번 수정.
+                //stringify2 매서드는 삭제하고, stringify로 대체했다.
+                //또한 stringify()는 String이 입력된 경우 입력 그대로 반환하므로
+                //이를 이용해 조건문을 간소화했다.
 
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             // return 으로 끝나는 경우에는 break안붙여도 됨.
