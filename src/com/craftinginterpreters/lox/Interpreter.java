@@ -91,11 +91,26 @@ class Interpreter implements Expr.Visitor<Object> {
                 text = text.substring(0, text.length()-2);
             } //만약 실수가 2.0처럼 .0으로 끝나면 .과 0은 출력하지 않는다.
             //록스는 정수타입이 없어서 실수도 정수로 계산하기 떄문에 소수점을 지워주는 부분을 추가했다.
+            //.0만 지워주는게 아니라 .00도 지운다.
+            //정확히 말하면 해당 매서는 .0만 지울 수 있지만 맨처음 Scanner 단계에서
+            // .00이 .0으로 변환되서 가능하다. 아무래도 자바 자체의 기능인듯 하다.
             return text;
         }
 
         return object.toString();
     }
+    //7장 본문에서는 평가값을 문자열로 바꿔서 interprete 매서드를 통해 출력할 때 사용했지만,
+    //7장 연습문제 2번에서 문자열 변환 접합을 할 떄도 사용 가능.
+    //다만 stringify는 소수점이 .0일 경우 그걸 지워버리기 때문에 그대로 사용하면 안된다.
+    //따라서 .0을 지우는 부분만 뺴고 나머지 기능은 동일한 stringify2 매서드를 만들어서 해결했다.
+
+    //이후 stirngify2()는 버전2를 구현하면서 삭제했다.
+    //stringify2()는 반대로 3을 입력시 3.0으로 출력되는 문제가 있었는데 이는 록스 언어의 구조적 문제점이다.
+    //록스 언어는 Double과 String 타입만 존재한다.
+    //따라서 3이던 3.0이던 위에서 언급한 3.00이던 전부 Double형 3.0으로 인식된다.
+    //이는 Scanner 레벨에서 수행되는 것으로 stringify() 매서드를 아무리 수정해도 고칠 수 없다.
+    //따라서 stringify2()는 삭제하고 stringify()를 사용하는 것으로 타협을 봤다.
+
 
 
     //7.3 지금까지의 에러처리는 문법이나 토큰같은 정적인 에러였다.
@@ -154,8 +169,13 @@ class Interpreter implements Expr.Visitor<Object> {
             case PLUS:
                 if(left instanceof Double && right instanceof Double)
                     return (double)left + (double)right;
-                if(left instanceof String && right instanceof String)
-                    return (String)left + (String)right;
+                if(left instanceof String || right instanceof String)
+                    return stringify(left) + stringify(right);
+                //7장 연습문제 2번 수정.
+                //stringify2 매서드는 삭제하고, stringify로 대체했다.
+                //또한 stringify()는 String이 입력된 경우 입력 그대로 반환하므로
+                //이를 이용해 조건문을 간소화했다.
+
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             // return 으로 끝나는 경우에는 break안붙여도 됨.
             // 그런데 PLUS는 if가 둘다 false인 경우 실행이 안되니 break를 붙인다
