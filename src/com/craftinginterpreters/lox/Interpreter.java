@@ -91,6 +91,8 @@ class Interpreter implements Expr.Visitor<Object> {
                 text = text.substring(0, text.length()-2);
             } //만약 실수가 2.0처럼 .0으로 끝나면 .과 0은 출력하지 않는다.
             //록스는 정수타입이 없어서 실수도 정수로 계산하기 떄문에 소수점을 지워주는 부분을 추가했다.
+            // 추가로 .00같은 건 Scanner 단계에서 토큰화 할 때 3.0으로 구분된다.
+            //록스 언어는 Double과 String만 다루고 때문에 3, 3.0, 3.00 ... 전부 3.0으로 인식된다.
             return text;
         }
 
