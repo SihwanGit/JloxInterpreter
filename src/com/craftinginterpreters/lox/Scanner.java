@@ -83,6 +83,11 @@ class Scanner {
             case ';': addToken(SEMICOLON); break;
             case '*': addToken(STAR); break;
 
+            //6장 연습문제 2번 ternary 용 토큰 ? :
+            //이 둘은 단일 렉심으로 이루어저 분기가 없으므로 그냥 나오는 족족 처리하면 된다.
+            case '?': addToken(QUESTION); break;
+            case ':': addToken(COLON); break;
+
             //2개 이상의 문자로 구성된 렉심
             //사실 *나 +-도 복합대입연산자나 증감연산자를 추가하면 검사해야됨.
             //지금은 문법상으로 이것들을 정의하지 않아서 구분하지 않은 것.

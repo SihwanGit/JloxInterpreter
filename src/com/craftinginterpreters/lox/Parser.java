@@ -33,7 +33,41 @@ public class Parser {
     // 6.2 록스 언어의 연산자 문법은 6.1장을 참고.
     // expression 중 가장 상위 계층(우선순위가 가장 낮은)인 동등식부터 파생된다.
     private Expr expression() {
-        return equality();
+        return comma();
+    }
+
+    // 6장 연습문제 1번 comma 식 : comma -> equality ( "," equality )*
+    // 6장 연습문제 2번 comma 식 : comma -> ternary ( "," ternary )*
+    // 2번에서 comma expression과 equality 사이에 ternary가 들어가면서 문법을 수정함.
+    private Expr comma() {
+        //먼저 예상부터 하자면, equality가 무조건 한번은 나오니까 expr = equality를 한번 찍고,
+        //그 다음 while을 이용해서 만약 뒤에 match(comma)면 operator은 "," right는 equality()로 시작 후
+        //다시 Expr로 묶을 것이다.
+
+        Expr expr = ternary(); //먼저 한번 나오고
+
+        while (match(COMMA)) { // ","가 안나올 떄까지 반복
+            Token operator = previous(); // op == comma
+            Expr right = ternary(); // right == ternary();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    //6장 연습문제 2번 ternary : ternary -> equality ("?" expression ":" ternary)?
+    private Expr ternary() {
+        Expr expr = equality(); //일단 equality는 나오고 시작
+
+        if (match(QUESTION)) { // ?가 나오면 삼항연산자 인식 시작
+            Expr thenBranch = expression(); // true branch는 expression
+            consume(COLON, "Expect ':' after true branch of ternary expression.");
+            //만약 expression() 뒤에 ":"가 나오지 않는다면 에러처리
+
+            Expr elseBranch = ternary(); // false branch는 우측결합을 위해 ternary
+            expr = new Expr.Ternary(expr, thenBranch, elseBranch);
+        }
+
+        return expr;
     }
 
     // 6.2 동등식 : equality -> comparison ( ( "!=" | "==" ) comparison ) *

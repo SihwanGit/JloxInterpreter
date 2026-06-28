@@ -14,6 +14,8 @@ public class AstPrinter implements Expr.Visitor<String>{
     public String visitBinaryExpr(Expr.Binary expr) {
         return parenthesize(expr.operator.lexeme, expr.left, expr.right);
         // 이항연산은 op, left, right를 출력
+
+        // 6장 연습문제 1 : comma 식도 Binary 연산에 속한다.
     }
 
     @Override
@@ -33,6 +35,13 @@ public class AstPrinter implements Expr.Visitor<String>{
     public String visitUnaryExpr(Expr.Unary expr) {
         return parenthesize(expr.operator.lexeme, expr.right);
         //단항 연산자들은 op와 operand를 괄호로 묶어 출력
+    }
+
+    //6장 연습문제 2번 : ternary 출력
+    @Override
+    public String visitTernaryExpr(Expr.Ternary expr) {
+        return parenthesize("?:", expr.condition, expr.thenBranch, expr.elseBranch);
+        //삼항연산자는 ?: 조건 if else 순으로 출력한다.
     }
 
     //5.4장 AST로 구성된 수식의 양 끝을 ( )로 묶는 매서드

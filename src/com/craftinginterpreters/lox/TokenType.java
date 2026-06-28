@@ -22,5 +22,9 @@ enum TokenType {
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
-    EOF
+    EOF,
+
+    // 6장 연습문제 2번 ternary 용 토큰 2개
+    // 각각 ? 와 :
+    QUESTION, COLON
 }
