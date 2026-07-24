@@ -96,6 +96,8 @@ abstract class Expr {
             this.right = right;
             // 이항 연산은 left op right 형태.
             // 할당은 op가 =으로 고정되어 있지만, 얘는 +-*/ 다 가능
+
+            // 6장 연습문제 1 : comma expression도 Binary 연산이다.
         }
 
         @Override

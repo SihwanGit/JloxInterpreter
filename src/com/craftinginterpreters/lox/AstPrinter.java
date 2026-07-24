@@ -14,6 +14,8 @@ public class AstPrinter implements Expr.Visitor<String>{
     public String visitBinaryExpr(Expr.Binary expr) {
         return parenthesize(expr.operator.lexeme, expr.left, expr.right);
         // 이항연산은 op, left, right를 출력
+
+        // 6장 연습문제 1 : comma 식도 Binary 연산에 속한다.
     }
 
     @Override
